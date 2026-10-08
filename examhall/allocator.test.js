@@ -86,3 +86,51 @@ test('keeps seat numbers unique across halls', () => {
   assert.equal(new Set(seatNumbers).size, seatNumbers.length);
   assert.deepEqual(seatNumbers, [1, 2]);
 });
+
+test('enforces each hall maximum student count and defaults to physical capacity', () => {
+  const cohorts = [
+    group('A', 'S1', 'A001', 'A002'),
+    group('B', 'S2', 'B001', 'B002')
+  ];
+  const halls = [
+    { floor: 1, hallNo: 1, rows: 2, cols: 2, maxDepartments: 2, maxStudents: 2 },
+    { floor: 1, hallNo: 2, rows: 2, cols: 2, maxDepartments: 2, maxStudents: 2 }
+  ];
+  const result = allocate(cohorts, halls, true, ['First', 'Second']);
+
+  assert.deepEqual(result.halls.map(hall => hall.seats.length), [2, 2]);
+  assert.deepEqual(result.halls.map(hall => hall.maxStudents), [2, 2]);
+  assert.equal(result.seated, 4);
+  assert.throws(() => allocate(cohorts, [halls[0]], true, ['Only']), /Not enough seats: 4 students, 2 usable seats/);
+  assert.equal(allocate([], [{ ...halls[0], maxStudents: undefined }], true, ['First']).halls[0].maxStudents, 4);
+  assert.throws(() => allocate([], [{ ...halls[0], maxStudents: 5 }], true, ['First']), /maximum student count/);
+  const blockedHall = { floor: 1, hallNo: 1, rows: 1, cols: 3, maxDepartments: 3, blocked: ['1-3'], maxStudents: 3 };
+  assert.equal(allocate([group('A', 'S1', 'A001', 'A001'), group('B', 'S2', 'B001', 'B001')], [blockedHall], true, ['Only']).seated, 2);
+  assert.throws(() => allocate([group('A', 'S1', 'A001', 'A001'), group('B', 'S2', 'B001', 'B001'), group('C', 'S3', 'C001', 'C001')], [blockedHall], true, ['Only']), /Not enough seats: 3 students, 2 usable seats/);
+});
+
+test('enforces maximum occupied seats per row and supports the F7 department rule', () => {
+  const separateDepartments = [
+    group('A', 'S1', 'A001', 'A001'),
+    group('B', 'S2', 'B001', 'B001')
+  ];
+  const oneRow = [{ floor: 1, hallNo: 1, rows: 1, cols: 2, maxDepartments: 2 }];
+  assert.throws(
+    () => allocate(separateDepartments, oneRow, false, ['Invigilator'], { maxPerRow: 1 }),
+    /No arrangement satisfies/
+  );
+
+  const sameDepartment = [
+    group('A', 'S1', 'A001', 'A001'),
+    group('A', 'S2', 'A002', 'A002')
+  ];
+  assert.equal(allocate(sameDepartment, oneRow, false, ['Invigilator'], {
+    maxPerRow: 2, sameDeptAdjacent: false
+  }).seated, 2);
+  assert.throws(
+    () => allocate(sameDepartment, oneRow, false, ['Invigilator'], {
+      maxPerRow: 2, sameDeptAdjacent: true
+    }),
+    /No arrangement satisfies/
+  );
+});

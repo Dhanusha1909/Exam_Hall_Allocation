@@ -2,135 +2,138 @@
 <title>Exam Hall Allocator</title>
 <style>
 *{box-sizing:border-box}
-:root{color-scheme:light;--ink:#17233b;--muted:#718096;--line:#e4eaf2;--blue:#3157d5;--blue-dark:#203ca3;--mint:#e9f8f1;--surface:#fff;--bg:#f4f7fb}
-body{font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.5}
-header{height:70px;display:flex;align-items:center;gap:12px;padding:0 max(24px,calc((100% - 1180px)/2));color:#fff;background:#172748;font-size:16px;font-weight:700;letter-spacing:.01em}
-.brand-mark{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:#4568e6;color:#fff;font-size:19px;box-shadow:inset 0 1px #ffffff44}
-main{max-width:1180px;margin:0 auto;padding:34px 24px 64px}
+:root{color-scheme:light;--ink:#18243c;--muted:#6d7890;--line:#e5eaf2;--blue:#405de6;--blue-dark:#3048c7;--mint:#e9f8f0;--surface:#fff;--bg:#f5f7fc}
+body{margin:0;background:radial-gradient(ellipse at 85% 0,#e7edff 0,transparent 34%),var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;line-height:1.5}
+header{height:68px;display:flex;align-items:center;gap:12px;padding:0 max(22px,calc((100% - 1120px)/2));background:#172544;color:#fff}
+.brand-mark{width:37px;height:37px;display:grid;place-items:center;border-radius:12px;background:#526cf0;color:#fff;font-size:14px;font-weight:850;letter-spacing:.04em}
+.brand-name{font-size:15px;font-weight:750;letter-spacing:.01em}.brand-name small{display:block;color:#aebada;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+main{max-width:1120px;margin:0 auto;padding:38px 24px 64px}
 .hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:0 0 25px}
-.eyebrow,.section-kicker{color:var(--blue);font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
-.hero h1{margin:5px 0 6px;font-size:clamp(28px,4vw,38px);line-height:1.15;letter-spacing:-.045em}
-.hero p{margin:0;color:var(--muted);font-size:15px}
-.hero-badge{flex:none;padding:9px 13px;border:1px solid #dce5f7;border-radius:999px;background:#fff;color:#476086;font-size:12px;font-weight:700}
-.workflow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
-section{min-width:0;padding:22px 23px;margin-bottom:18px;border:1px solid #e8edf4;border-radius:16px;background:var(--surface);box-shadow:0 5px 22px #18345b09}
-.workflow>section{margin-bottom:0}
-.section-heading{display:flex;align-items:flex-start;gap:13px;margin-bottom:17px}
-.step{flex:none;width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:#edf1ff;color:var(--blue);font-size:14px;font-weight:800}
-.section-kicker{margin:0 0 2px}
-h2{margin:0;font-size:18px;letter-spacing:-.02em}
-.section-description,.hint{color:var(--muted);font-size:13px}
-.section-description{margin:3px 0 0}
+.eyebrow{margin:0;color:var(--blue);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.hero h1{margin:5px 0 7px;font-size:clamp(29px,4vw,40px);line-height:1.1;letter-spacing:-.045em}
+.hero p{max-width:650px;margin:0;color:var(--muted);font-size:15px}
+.hero-badge{flex:none;padding:8px 12px;border:1px solid #dce4fb;border-radius:999px;background:#fff;color:#52648e;font-size:12px;font-weight:700}
+.tabs{display:flex;gap:6px;padding:6px;margin-bottom:18px;border:1px solid #e8ecf5;border-radius:14px;background:#fff;box-shadow:0 6px 22px #25395d0a}
+.tab{display:flex;align-items:center;gap:9px;min-height:44px;padding:8px 14px;border:0;border-radius:10px;background:transparent;color:#6d7890;font-size:13px;font-weight:700;cursor:pointer}
+.tab:hover{background:#f4f6ff;color:var(--ink)}
+.tab[aria-selected=true]{background:#edf0ff;color:#3048c7}
+.tab-number{width:22px;height:22px;display:grid;place-items:center;border-radius:7px;background:#fff;font-size:11px}
+.tab[aria-selected=true] .tab-number{background:#405de6;color:#fff}
+.tab-panel[hidden]{display:none}
+.setup-card{padding:0}
+.panel-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0}
+.setup-section{min-width:0;padding:24px}
+.setup-section+.setup-section{border-left:1px solid var(--line)}
+.card{min-width:0;padding:22px;border:1px solid #e7ebf3;border-radius:16px;background:var(--surface);box-shadow:0 6px 22px #25395d08}
+.card-heading{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.step{flex:none;width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:#edf0ff;color:var(--blue);font-size:13px;font-weight:800}
+.card-heading h2,.panel-title h2{margin:0;font-size:18px;letter-spacing:-.025em}
+.card-heading p,.panel-title p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.section-title{margin:0 0 10px;font-size:12px;font-weight:750;color:#45516c}
 input,textarea{font:inherit;color:var(--ink)}
-input{width:100%;min-width:0;padding:10px 11px;border:1px solid #dfe5ee;border-radius:9px;background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
-input:focus,textarea:focus{border-color:#7790ed;box-shadow:0 0 0 3px #4568e61c}
-input::placeholder,textarea::placeholder{color:#94a0b2}
+input{width:100%;min-width:0;padding:9px 10px;border:1px solid #dfe5ef;border-radius:9px;background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,textarea:focus{border-color:#8192f0;box-shadow:0 0 0 3px #526cf01c}
+input::placeholder,textarea::placeholder{color:#929db0}
 input[type=number]{appearance:textfield}
-textarea{display:block;width:100%;min-height:92px;padding:11px 12px;margin:8px 0 0;border:1px solid #dfe5ee;border-radius:9px;resize:vertical}
-.row{display:grid;grid-template-columns:repeat(3,minmax(105px,1fr)) minmax(100px,1fr) minmax(100px,1fr) minmax(110px,1fr) minmax(110px,1fr) 34px;gap:7px;align-items:center;margin:0 0 9px}
-#halls .row{grid-template-columns:70px minmax(75px,1fr) 70px 70px minmax(100px,1fr) 105px 34px}
+textarea{display:block;width:100%;min-height:84px;padding:10px 11px;margin-top:7px;border:1px solid #dfe5ef;border-radius:9px;resize:vertical}
+.row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;align-items:center;margin:0 0 8px}
+.cohort-row{padding:12px;border:1px solid #e9edf5;border-radius:12px;background:#fbfcff;margin-bottom:12px}
+.cohort-row{grid-template-areas:"dept year subject remove" "startReg startReg endReg endReg" "lateralRegs lateralRegs transferRegs transferRegs"}
+.cohort-row [data-f="dept"]{grid-area:dept}.cohort-row [data-f="year"]{grid-area:year}.cohort-row [data-f="subject"]{grid-area:subject}.cohort-row [data-f="startReg"]{grid-area:startReg}.cohort-row [data-f="endReg"]{grid-area:endReg}.cohort-row [data-f="lateralRegs"]{grid-area:lateralRegs}.cohort-row [data-f="transferRegs"]{grid-area:transferRegs}.cohort-row button{grid-area:remove}
+#halls .row{grid-template-areas:"floor hallNo hallNo remove" "rows cols maxDepartments maxDepartments" "maxStudents maxStudents maxStudents maxStudents" "blocked blocked blocked blocked"}
+#halls .row [data-f="floor"]{grid-area:floor}#halls .row [data-f="hallNo"]{grid-area:hallNo}#halls .row [data-f="rows"]{grid-area:rows}#halls .row [data-f="cols"]{grid-area:cols}#halls .row [data-f="blocked"]{grid-area:blocked}#halls .row [data-f="maxDepartments"]{grid-area:maxDepartments}#halls .row [data-f="maxStudents"]{grid-area:maxStudents}#halls .row button{grid-area:remove}
 button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:39px;padding:9px 14px;border:0;border-radius:9px;background:var(--blue);color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,transform .15s,box-shadow .15s}
-button:hover{background:var(--blue-dark);box-shadow:0 4px 12px #3157d533;transform:translateY(-1px)}
-button.alt{border:1px solid #dce4f0;background:#fff;color:#35445e}
-button.alt:hover{border-color:#b9c7e2;background:#f7f9fd;box-shadow:none}
-button.remove{min-height:36px;width:34px;padding:0;border:1px solid #f0dada;background:#fff6f6;color:#b94b52;font-size:19px}
-button.remove:hover{background:#ffeded}
-.add-button{margin-top:4px}
-.hint{display:block;margin:12px 0 0;line-height:1.55}
-.invigilator-label{display:block;margin:18px 0 0;font-size:13px;font-weight:750}
-.invigilator-label span{display:block;margin-top:3px;color:var(--muted);font-size:12px;font-weight:400}
-.actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
-.actions .primary{min-height:44px;padding:11px 18px}
-.toggle{display:flex;align-items:flex-start;gap:9px;max-width:480px;margin-left:auto;color:#526078;font-size:12px}
+button:hover{background:var(--blue-dark);box-shadow:0 4px 12px #405de633;transform:translateY(-1px)}
+button:focus-visible{outline:3px solid #aab5ff;outline-offset:2px}
+button.alt{border:1px solid #dfe5ef;background:#fff;color:#3f4b65}
+button.alt:hover{border-color:#c8d1e6;background:#f7f8fc;box-shadow:none}
+button.remove{width:34px;min-height:36px;padding:0;border:1px solid #f1d9d9;background:#fff7f7;color:#b94b52;font-size:19px}
+.hint{display:block;margin:12px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+.invigilator-label{display:block;margin:17px 0 0;font-size:12px;font-weight:750}
+.invigilator-label span{display:block;margin-top:3px;color:var(--muted);font-size:11px;font-weight:400}
+.setup-actions{grid-column:1/-1;display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.setup-actions .primary{min-height:44px;padding:11px 18px}
+.toggle{display:flex;align-items:flex-start;gap:8px;max-width:430px;margin-left:auto;color:#56617a;font-size:11px}
 .toggle input{flex:none;width:16px;height:16px;margin:2px 0;accent-color:var(--blue)}
-#msg{width:100%;min-height:0;margin-top:3px}
-.ok,.bad{display:inline-block;padding:9px 12px;border-radius:9px;font-size:13px;font-weight:700}
-.ok{background:var(--mint);color:#167748}
-.bad{background:#fff0ee;color:#b3261e}
-#result{margin-top:18px}
-#result h2{font-size:20px}
-#dl{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 20px}
+#msg{min-height:0;margin:14px 0 0}
+.ok,.bad{display:inline-block;padding:8px 11px;border-radius:9px;font-size:12px;font-weight:700}
+.ok{background:var(--mint);color:#167748}.bad{background:#fff0ee;color:#b3261e}
+.panel-title{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
+#dl{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 16px}
 #dl a{text-decoration:none}
 #dl button{min-height:35px;padding:7px 11px;font-size:12px}
-.hall{margin:15px 0;padding:17px;border:1px solid var(--line);border-radius:13px;background:#fbfcfe;overflow-x:auto}
+.empty-state{padding:44px 20px;border:1px dashed #d6ddeb;border-radius:14px;background:#fbfcff;text-align:center}
+.empty-state-icon{width:48px;height:48px;display:grid;place-items:center;margin:0 auto 12px;border-radius:15px;background:#edf0ff;color:#405de6;font-size:22px}
+.empty-state h3{margin:0 0 5px;font-size:16px}.empty-state p{max-width:380px;margin:0 auto 16px;color:var(--muted);font-size:13px}
+.hall{margin:13px 0;padding:17px;border:1px solid var(--line);border-radius:13px;background:#fbfcfe;overflow-x:auto}
 .hall-title{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:13px}
-.hall-title strong{font-size:15px}
-.hall-meta{color:var(--muted);font-size:12px}
+.hall-title strong{font-size:14px}.hall-meta{color:var(--muted);font-size:11px}
 .invigilator-chip{flex:none;padding:6px 9px;border:1px solid #dce5f7;border-radius:999px;background:#f2f5ff;color:#455da4;font-size:11px;font-weight:700}
-.grid{display:grid;gap:6px;min-width:max-content}
-.seat{min-width:82px;min-height:71px;display:flex;flex-direction:column;justify-content:center;padding:7px 4px;border:1px solid #17233b12;border-radius:9px;text-align:center;color:#17233b;font-size:10px;line-height:1.35;box-shadow:0 1px 2px #162b490c}
-.seat b{font-size:11px;letter-spacing:.01em}
-.seat.empty{min-height:71px;display:grid;place-items:center;border:1px dashed #d9e0e9;background:#f1f3f6;color:#adb6c4;box-shadow:none;font-size:18px}
-.hall-subjects{display:block;margin-top:13px;color:#68758a;font-size:12px}
+.grid{display:grid;gap:5px;min-width:max-content}
+.seat{min-width:72px;min-height:63px;display:flex;flex-direction:column;justify-content:center;padding:6px 3px;border:1px solid #17233b12;border-radius:8px;text-align:center;color:#17233b;font-size:9px;line-height:1.35;box-shadow:0 1px 2px #162b490c}
+.seat b{font-size:10px;letter-spacing:.01em}
+.seat.empty{min-height:63px;display:grid;place-items:center;border:1px dashed #d9e0e9;background:#f1f3f6;color:#adb6c4;box-shadow:none;font-size:16px}
+.hall-subjects{display:block;margin-top:12px;color:#68758a;font-size:11px}
 .hall-action{margin-top:8px}
-.finder{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:14px}
-.finder .section-heading{margin:0}
-.finder-controls{display:flex;gap:8px}
-#q{max-width:330px}
-#found{grid-column:2}
-@media(max-width:900px){.workflow{grid-template-columns:1fr}.row{grid-template-columns:repeat(2,minmax(0,1fr)) 34px}.row input[data-f="dept"],.row input[data-f="subject"],.row input[data-f="startReg"],.row input[data-f="endReg"],.row input[data-f="lateralRegs"],.row input[data-f="transferRegs"]{grid-column:span 1}#halls .row{grid-template-columns:repeat(3,minmax(0,1fr)) 34px}.toggle{margin:0}}
-@media(max-width:560px){header{height:60px;padding:0 16px}main{padding:24px 14px 42px}.hero{display:block}.hero-badge{display:inline-flex;margin-top:15px}section{padding:18px 15px;border-radius:13px}.row,#halls .row{grid-template-columns:repeat(2,minmax(0,1fr)) 34px;gap:6px}.row button{grid-column:3;grid-row:1}.actions{align-items:stretch}.actions button{width:100%}.toggle{width:100%;margin-top:4px}.finder{grid-template-columns:1fr}.finder-controls{flex-wrap:wrap}#q{max-width:none;flex:1;min-width:140px}#found{grid-column:1}.hall{padding:12px}.hall-title{display:block}.invigilator-chip{display:inline-block;margin-top:7px}}
-body{font-family:system-ui,sans-serif;margin:0;background:#f4f6fb;color:#1c2333;line-height:normal}
-header{height:auto;display:block;padding:14px 24px;background:#27407a;color:#fff;font-size:20px;font-weight:400;letter-spacing:normal}
-main{max-width:1100px;margin:auto;padding:16px 16px 40px}
-section{padding:16px;margin:0 0 16px;border:0;border-radius:10px;background:#fff;box-shadow:0 1px 4px #0001}
-h2{margin:0 0 10px;font-size:17px;letter-spacing:normal}
-input{display:inline-block;width:105px;min-width:0;padding:6px;margin:2px;border:1px solid #bbc;border-radius:5px;background:#fff;font:inherit}
-input[type=number]{appearance:auto}
-textarea{display:block;width:min(500px,95%);min-height:70px;padding:8px;margin:6px 0;border:1px solid #bbc;border-radius:5px;font:inherit;resize:vertical}
-.row,#halls .row{display:block;margin-bottom:4px}
-button{display:inline-block;min-height:0;padding:8px 14px;border:0;border-radius:6px;background:#27407a;color:#fff;font:inherit;font-size:14px;font-weight:400;cursor:pointer;margin:3px;box-shadow:none;transform:none}
-button:hover{background:#203ca3;box-shadow:none;transform:none}
-button.alt{background:#5a6785;color:#fff;border:0}
-button.alt:hover{background:#46536f}
-small{color:#526078}
-#msg{margin-top:8px}
-.ok,.bad{padding:0;border-radius:0;background:transparent;font-size:inherit}
-.ok{color:#117a3d}.bad{color:#b3261e}
-#dl{display:block;margin:10px 0}
-.hall{margin:14px 0;padding:12px;border:0;border-radius:0;background:transparent;overflow-x:auto}
-.hall-title{display:block;margin-bottom:8px}
-.hall-title strong{font-size:inherit}
-.hall-meta{color:#526078;font-size:12px}
-.invigilator-chip{display:inline-block;margin-top:4px;padding:0;border:0;border-radius:0;background:transparent;color:#35445e;font-size:12px}
-.grid{gap:4px;min-width:0}
-.seat{display:block;min-width:62px;min-height:0;padding:5px 2px;border:0;border-radius:4px;text-align:center;color:#111;font-size:10px;line-height:1.35;box-shadow:none}
-.seat b{font-size:10px}
-.seat.empty{display:grid;min-height:0;border:0;background:#e4e4e4;color:#777;box-shadow:none;font-size:14px}
-.hall-subjects{display:block;margin-top:8px;color:#526078;font-size:12px}
-#q{max-width:none}
-@media(max-width:560px){header{height:auto;padding:14px 16px}main{padding:16px 12px 32px}.row,#halls .row{display:block}.row button{width:auto}.hall{padding:8px}.seat{min-width:55px}#q{width:200px;max-width:100%}}
-@media print{
- body{background:#fff}
- main{max-width:none;padding:0}
- main>section:not(#result),#dl,.hall-action,#msg{display:none!important}
- #result{display:block!important;margin:0;padding:0;box-shadow:none}
- .hall{break-inside:avoid;overflow:visible}
- .grid{min-width:0}
-}
+.finder-card{max-width:700px;margin:auto}
+.finder-form{display:flex;gap:9px;margin-top:20px}
+.finder-form input{max-width:420px;min-height:44px}
+#found{margin-top:18px}
+.finder-result{padding:15px;border:1px solid #dfe8fc;border-radius:12px;background:#f7f9ff}
+.finder-result strong{font-size:15px}
+@media(max-width:900px){.panel-grid{grid-template-columns:1fr}.setup-section{padding:20px}.setup-section+.setup-section{border-top:1px solid var(--line);border-left:0}.row input[data-f="dept"],.row input[data-f="subject"],.row input[data-f="startReg"],.row input[data-f="endReg"],.row input[data-f="lateralRegs"],.row input[data-f="transferRegs"]{grid-column:span 1}.toggle{margin:0}}
+@media(max-width:600px){header{height:60px;padding:0 16px}main{padding:25px 13px 42px}.hero{display:block}.hero-badge{display:inline-flex;margin-top:13px}.tabs{gap:2px;padding:4px}.tab{flex:1;justify-content:center;padding:7px 5px;font-size:11px}.tab-number{display:none}.setup-section{padding:17px 14px}.card:not(.setup-card){padding:17px}.setup-actions{align-items:stretch;padding:0 14px 17px}.setup-actions button{width:100%}.toggle{width:100%;margin-top:3px}.row{grid-template-areas:"dept year remove" "subject subject subject" "startReg startReg startReg" "endReg endReg endReg" "lateralRegs lateralRegs lateralRegs" "transferRegs transferRegs transferRegs";grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.row input[data-f="dept"]{grid-area:dept}.row input[data-f="year"]{grid-area:year}.row input[data-f="subject"]{grid-area:subject}.row input[data-f="startReg"]{grid-area:startReg}.row input[data-f="endReg"]{grid-area:endReg}.row input[data-f="lateralRegs"]{grid-area:lateralRegs}.row input[data-f="transferRegs"]{grid-area:transferRegs}.row button{grid-area:remove;width:34px;grid-column:auto;grid-row:auto}#halls .row{grid-template-areas:"floor hallNo" "rows cols" "maxDepartments maxDepartments" "maxStudents maxStudents" "blocked blocked" "remove remove";grid-template-columns:repeat(2,minmax(0,1fr))}#halls .row [data-f="floor"]{grid-area:floor}#halls .row [data-f="hallNo"]{grid-area:hallNo}#halls .row [data-f="rows"]{grid-area:rows}#halls .row [data-f="cols"]{grid-area:cols}#halls .row [data-f="blocked"]{grid-area:blocked}#halls .row [data-f="maxDepartments"]{grid-area:maxDepartments}#halls .row [data-f="maxStudents"]{grid-area:maxStudents}#halls .row button{grid-area:remove;grid-column:1/-1;grid-row:auto;justify-self:end}.hall{padding:12px}.hall-title{display:block}.invigilator-chip{display:inline-block;margin-top:7px}.finder-form{flex-direction:column}.finder-form input{max-width:none}.finder-form button{width:100%}}
+@media print{body{background:#fff}header,.hero,.tabs,#setup-panel,#finder-panel,#msg,#dl,.hall-action{display:none!important}main{max-width:none;padding:0}.tab-panel[hidden]{display:block!important}#results-panel{display:block!important}.card{padding:0;border:0;box-shadow:none}.hall{break-inside:avoid;overflow:visible}.grid{min-width:0}}
 </style></head><body>
-<header>Exam Hall Allocation Tool</header><main>
-<section><h2>1. Student groups (department / year / subject / register range)</h2>
-<div id="cohorts"></div><button class="alt" onclick="addCohort()">+ Add group</button>
-<small><br>Register ranges are normal students. Enter lateral and transfer register numbers separately; students are assigned normal first, then lateral, then transfer.</small></section>
-<section><h2>2. Halls (floor, hall no, rows × columns, blocked seats, maximum departments)</h2>
-<div id="halls"></div><button class="alt" onclick="addHall()">+ Add hall</button>
-<small><br>Each occupied column contains one department. Maximum departments limits the distinct departments assigned to each hall.</small>
-<p><label for="invigilators"><b>Invigilators</b> (comma or newline separated; one unique invigilator per hall, assigned in hall order)</label></p>
-<textarea id="invigilators" placeholder="e.g. Dr. Kumar, Ms. Priya, Mr. Ravi"></textarea></section>
-<section><button onclick="save()">Save &amp; Generate Seating</button>
-<button class="alt" onclick="sample()">Load sample data</button>
-<label><input type="checkbox" id="strict" checked style="width:auto"> Strict (same departments and subjects cannot be horizontal or diagonal neighbors)</label>
-<div id="msg"></div></section>
-<section id="result" style="display:none"><h2>3. Seating arrangement</h2><div id="dl"></div><div id="viz"></div></section>
-<section><h2>4. Student seat finder</h2><input id="q" placeholder="Register number" aria-label="Register number" style="width:200px">
-<button onclick="find()">Find my seat</button><div id="found"></div></section></main>
+<header><span class="brand-mark">EA</span><span class="brand-name">Code Warriors<small>Exam Hall allocation</small></span></header><main>
+<div class="hero"><div><p class="eyebrow">Exam day, made easier</p><h1>Plan seats with confidence.</h1><p>Organize student groups, build a balanced seating plan, and quickly find where everyone needs to be.</p></div><span class="hero-badge">Smart seating planner</span></div>
+<nav class="tabs" role="tablist" aria-label="Exam hall workflow">
+ <button class="tab" id="setup-tab" type="button" role="tab" aria-selected="true" aria-controls="setup-panel" onclick="showTab('setup')"><span class="tab-number">1</span> Setup</button>
+ <button class="tab" id="results-tab" type="button" role="tab" aria-selected="false" aria-controls="results-panel" tabindex="-1" onclick="showTab('results')"><span class="tab-number">2</span> Seating results</button>
+ <button class="tab" id="finder-tab" type="button" role="tab" aria-selected="false" aria-controls="finder-panel" tabindex="-1" onclick="showTab('finder')"><span class="tab-number">3</span> Find a student</button>
+</nav>
+<div id="msg" aria-live="polite"></div>
+<div class="tab-panel" id="setup-panel" role="tabpanel" aria-labelledby="setup-tab">
+ <section class="card setup-card"><div class="panel-grid">
+  <div class="setup-section"><div class="card-heading"><span class="step">01</span><div><h2>Who is sitting the exam?</h2><p>Add each department, subject and register range.</p></div></div>
+   <div id="cohorts"></div><button class="alt" type="button" onclick="addCohort()">＋ Add student group</button>
+   <small class="hint">Lateral and transfer registers are optional. Students are seated in normal, lateral, then transfer order.</small>
+  </div>
+  <div class="setup-section"><div class="card-heading"><span class="step">02</span><div><h2>Where will they sit?</h2><p>Add your halls and their seating capacity.</p></div></div>
+   <div id="halls"></div><button class="alt" type="button" onclick="addHall()">＋ Add exam hall</button>
+   <small class="hint">Use the floor number and hall number students and staff recognize, for example Floor 1 · Hall 101.</small>
+   <small class="hint">Departments stay in one column. Set the maximum number of departments allowed in each hall.</small>
+   <label class="invigilator-label" for="invigilators">Invigilators<span>Enter a unique name for each hall, in the same order as above.</span></label>
+   <textarea id="invigilators" placeholder="For example: Dr. Kumar, Ms. Priya, Mr. Ravi"></textarea>
+  </div>
+ </div><div class="setup-actions">
+   <button class="primary" type="button" onclick="save()">Create seating plan</button>
+   <button class="alt" type="button" onclick="sample()">Load example setup</button>
+   <label class="toggle"><input type="checkbox" id="strict" checked> <span><strong>Strict spacing</strong><br>Keep students from the same department or subject apart horizontally and diagonally.</span></label>
+  </div></section>
+</div>
+<div class="tab-panel" id="results-panel" role="tabpanel" aria-labelledby="results-tab" hidden>
+ <section class="card" id="result">
+  <div class="panel-title"><div><h2>Your seating plan</h2><p>Review hall assignments or print a fresh copy for exam day.</p></div></div>
+  <div id="empty-results" class="empty-state"><span class="empty-state-icon">▦</span><h3>Your plan will show up here</h3><p>Add your student groups and halls in Setup, then create a seating plan to see everyone’s seat.</p><button type="button" onclick="showTab('setup')">Go to setup</button></div>
+  <div id="dl"></div><div id="viz"></div>
+ </section>
+</div>
+<div class="tab-panel" id="finder-panel" role="tabpanel" aria-labelledby="finder-tab" hidden>
+ <section class="card finder-card"><div class="card-heading"><span class="step">03</span><div><h2>Find a student’s seat</h2><p>Enter a register number to look up the hall, row and seat.</p></div></div>
+  <form class="finder-form" onsubmit="find(event)"><input id="q" placeholder="e.g. 21CS001" aria-label="Register number" required><button type="submit">Find seat</button></form>
+  <div id="found" aria-live="polite"></div>
+ </section>
+</div></main>
 <script>
 const $=id=>document.getElementById(id);
-const cf=['dept','year','subject','startReg','endReg','lateralRegs','transferRegs'], hf=['floor','hallNo','rows','cols','blocked','maxDepartments'];
-function row(box,fields,v={}){const d=document.createElement('div');d.className='row';
- const labels={lateralRegs:'Lateral regs',transferRegs:'Transfer regs',maxDepartments:'Max departments'};
- fields.forEach(f=>d.innerHTML+=`<input data-f="${f}" type="${f==='maxDepartments'?'number':'text'}" ${f==='maxDepartments'?'min="1"':''} placeholder="${labels[f]||f}" value="${v[f]??''}">`);
+const cf=['dept','year','subject','startReg','endReg','lateralRegs','transferRegs'], hf=['floor','hallNo','rows','cols','blocked','maxDepartments','maxStudents'];
+const tabNames=['setup','results','finder'];
+function showTab(name){tabNames.forEach(tab=>{const selected=tab===name;$(tab+'-tab').setAttribute('aria-selected',selected);$(tab+'-tab').tabIndex=selected?0:-1;$(tab+'-panel').hidden=!selected})}
+document.querySelector('.tabs').addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const current=tabNames.findIndex(tab=>$(tab+'-tab')===event.target);const next=event.key==='Home'?0:event.key==='End'?tabNames.length-1:(current+(event.key==='ArrowRight'?1:-1)+tabNames.length)%tabNames.length;showTab(tabNames[next]);$(tabNames[next]+'-tab').focus()});
+function row(box,fields,v={}){const d=document.createElement('div');d.className=`row ${box==='cohorts'?'cohort-row':'hall-row'}`;
+ const labels={dept:'Department',year:'Year',subject:'Subject',startReg:'Starting register number',endReg:'Ending register number',lateralRegs:'Lateral register numbers (optional)',transferRegs:'Transfer register numbers (optional)',floor:'Floor number (e.g. 1)',hallNo:'Hall number (e.g. 101)',rows:'Number of rows',cols:'Number of columns',blocked:'Blocked seats (e.g. 1-2)',maxDepartments:'Maximum departments',maxStudents:'Maximum students (defaults to seats)'};
+ fields.forEach(f=>d.innerHTML+=`<input data-f="${f}" type="${f==='maxDepartments'||f==='maxStudents'?'number':'text'}" ${f==='maxDepartments'||f==='maxStudents'?'min="1"':''} aria-label="${labels[f]}" title="${labels[f]}" placeholder="${labels[f]}" value="${v[f]??''}">`);
  d.innerHTML+='<button class="remove" type="button" aria-label="Remove row" title="Remove row" onclick="this.parentNode.remove()">×</button>';$(box).appendChild(d)}
 const addCohort=v=>row('cohorts',cf,v), addHall=v=>row('halls',hf,{maxDepartments:2,...v});
 const read=(box)=>[...$(box).children].map(r=>Object.fromEntries([...r.querySelectorAll('input')].map(i=>[i.dataset.f,i.value.trim()])));
@@ -141,19 +144,19 @@ function sample(){$('cohorts').innerHTML=$('halls').innerHTML='';$('invigilators
  addHall({floor:1,hallNo:'101',rows:8,cols:8,blocked:'',maxDepartments:4});addHall({floor:1,hallNo:'102',rows:8,cols:8,blocked:'1-1',maxDepartments:4});addHall({floor:2,hallNo:'201',rows:8,cols:8,blocked:'',maxDepartments:4})}
 function payload(){return{strict:$('strict').checked,
  cohorts:read('cohorts').map(c=>({...c,year:+c.year,lateralRegs:c.lateralRegs?c.lateralRegs.split(',').map(s=>s.trim()).filter(Boolean):[],transferRegs:c.transferRegs?c.transferRegs.split(',').map(s=>s.trim()).filter(Boolean):[]})),
- halls:read('halls').map(h=>({floor:+h.floor,hallNo:h.hallNo,rows:+h.rows,cols:+h.cols,maxDepartments:Number(h.maxDepartments),blocked:h.blocked?h.blocked.split(',').map(s=>s.trim()):[]})),
+ halls:read('halls').map(h=>({floor:+h.floor,hallNo:h.hallNo,rows:+h.rows,cols:+h.cols,maxDepartments:Number(h.maxDepartments),maxStudents:h.maxStudents===''?undefined:Number(h.maxStudents),blocked:h.blocked?h.blocked.split(',').map(s=>s.trim()):[]})),
  invigilators:$('invigilators').value.split(/[,\n]/).map(s=>s.trim()).filter(Boolean)}}
-async function save(){const p=payload();$('msg').textContent='Working...';
+async function save(){const p=payload();$('msg').textContent='Creating your seating plan...';
  try{
  const saved=await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
  if(!saved.ok)throw new Error('Could not save the configuration.');
  const r=await fetch('/api/allocate',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),d=await r.json();
- if(!r.ok)throw new Error(d.error||'Allocation failed.');
- $('msg').innerHTML=d.conflicts===0?`<span class="ok">✔ ${d.seated} students seated, 0 conflicts detected</span>`:`<span class="bad">${d.conflicts} conflicts</span>`;
- draw(d)}catch(e){$('msg').innerHTML=`<span class="bad">${e.message}</span>`}}
+ if(!r.ok)throw new Error(d.message||d.error||'Allocation failed.');
+ $('msg').innerHTML=d.conflicts===0?`<span class="ok">✓ Seating plan ready · ${d.seated} students assigned with no conflicts.</span>`:`<span class="bad">${d.conflicts} seating conflicts need attention.</span>`;
+ draw(d);showTab('results')}catch(e){$('msg').innerHTML=`<span class="bad">${escapeHTML(e.message)}</span>`}}
 function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const colors={};const col=k=>colors[k]||(colors[k]=`hsl(${Object.keys(colors).length*67%360} 70% 80%)`);
-function draw(d){$('result').style.display='block';
+function draw(d){$('empty-results').hidden=true;
  const floors=[...new Set(d.halls.map(h=>h.floor))];
  $('dl').innerHTML='<button class="print-action" onclick="window.print()">Print seating list</button>'+
   floors.map(f=>`<a href="/api/export/floor/${f}"><button>↓ Export floor ${f}</button></a>`).join('')+
@@ -161,7 +164,7 @@ function draw(d){$('result').style.display='block';
  $('viz').innerHTML=d.halls.map(h=>{const g={};h.seats.forEach(s=>g[s.row+'-'+s.col]=s);let cells='';
   for(let r=1;r<=h.rows;r++)for(let c=1;c<=h.cols;c++){const s=g[r+'-'+c];
    cells+=s?`<div class="seat" style="background:${col(s.dept)}" title="${s.subject} · ${s.studentType}"><b>${s.reg}</b><br>${s.dept}-Y${s.year}<br>${s.studentType} · Seat ${s.seatNo}</div>`:'<div class="seat empty">—</div>'}
-  return `<div class="hall"><div class="hall-title"><div><strong>Floor ${h.floor} · Hall ${escapeHTML(h.hallNo)}</strong><div class="hall-meta">${h.seats.length}/${h.rows*h.cols} seats &nbsp;·&nbsp; ${new Set(h.seats.map(s=>s.dept)).size} of ${h.maxDepartments} departments</div>
+  return `<div class="hall"><div class="hall-title"><div><strong>Floor ${h.floor} · Hall ${escapeHTML(h.hallNo)}</strong><div class="hall-meta">${h.seats.length}/${h.maxStudents} students &nbsp;·&nbsp; ${new Set(h.seats.map(s=>s.dept)).size} of ${h.maxDepartments} departments</div>
   <button class="alt hall-action" data-hall="${escapeHTML(h.hallNo)}" onclick="reallocate(this.dataset.hall)">Hall unusable · Re-allocate</button></div><span class="invigilator-chip">Invigilator: ${escapeHTML(h.invigilator)}</span></div>
   <div class="grid" style="grid-template-columns:repeat(${h.cols},1fr)">${cells}</div>
   <small class="hall-subjects">Subjects: ${h.subjects.map(s=>`${s.subject} (${s.dept} Y${s.year})`).join('; ')}</small></div>`}).join('')}
@@ -170,12 +173,14 @@ async function reallocate(hallNo){
  $('msg').textContent='Re-allocating students...';
  try{
   const r=await fetch('/api/reallocate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({hallNo})}),d=await r.json();
-  if(!r.ok)throw new Error(d.error||'Re-allocation failed.');
+  if(!r.ok)throw new Error(d.message||d.error||'Re-allocation failed.');
   $('msg').innerHTML=`<span class="ok">✔ Hall ${escapeHTML(hallNo)} marked unusable. ${d.seated} students re-allocated with ${d.conflicts} conflicts.</span>`;
   draw(d)
  }catch(e){$('msg').innerHTML=`<span class="bad">${escapeHTML(e.message)}</span>`}
 }
-async function find(){const r=await fetch('/api/search/'+encodeURIComponent($('q').value)),d=await r.json();
- $('found').innerHTML=r.ok?`<p class="ok">Hall ${d.hallNo} (Floor ${d.floor}) · Row ${d.row}, Column ${d.col} · Seat ${d.seatNo}<br>${d.dept} Year ${d.year} — ${d.subject} (${d.studentType})</p>`:`<p class="bad">${d.error}</p>`}
+async function find(event){event.preventDefault();$('found').textContent='Looking up this student...';
+ try{const r=await fetch('/api/search/'+encodeURIComponent($('q').value.trim())),d=await r.json();
+  $('found').innerHTML=r.ok?`<div class="finder-result"><strong>${escapeHTML(d.reg)} has a seat</strong><p class="ok">Hall ${escapeHTML(d.hallNo)} · Floor ${escapeHTML(d.floor)}<br>Row ${d.row}, Column ${d.col} · Seat ${d.seatNo}<br>${escapeHTML(d.dept)} Year ${escapeHTML(d.year)} — ${escapeHTML(d.subject)} (${escapeHTML(d.studentType)})</p></div>`:`<p class="bad">${escapeHTML(d.error)}</p>`
+ }catch(e){$('found').innerHTML=`<p class="bad">Could not look up this student. Please try again.</p>`}}
 sample();
 </script></body></html>

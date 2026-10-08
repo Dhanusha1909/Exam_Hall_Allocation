@@ -24,7 +24,7 @@ function buildCohorts(cohorts) {
   });
 }
 
-function allocate(cohortsIn, halls, strict = true, invigilators = []) {
+function allocate(cohortsIn, halls, strict = true, invigilators = [], options = {}) {
   const C = buildCohorts(cohortsIn), K = C.length;
   if (!Array.isArray(invigilators) || invigilators.some(name => typeof name !== 'string' || !name.trim())) {
     throw new Error('Enter a valid invigilator name for every hall.');
@@ -40,25 +40,44 @@ function allocate(cohortsIn, halls, strict = true, invigilators = []) {
     if (!Number.isInteger(max) || max < 1) throw new Error(`Hall ${h.hallNo} must have a valid positive integer maximum department count.`);
     return max;
   });
+  const maxStudents = halls.map(h => {
+    const raw = h.maxStudents === undefined || h.maxStudents === '' ? h.rows * h.cols : h.maxStudents;
+    const max = typeof raw === 'number' ? raw : typeof raw === 'string' && raw.trim() ? Number(raw) : NaN;
+    if (!Number.isInteger(max) || max < 1 || max > h.rows * h.cols) {
+      throw new Error(`Hall ${h.hallNo} must have a maximum student count between 1 and its physical seat count (${h.rows * h.cols}).`);
+    }
+    return max;
+  });
+  const maxPerRow = options.maxPerRow === undefined ? Infinity : options.maxPerRow;
+  if (!(maxPerRow === Infinity || Number.isInteger(maxPerRow) && maxPerRow > 0)) {
+    throw new Error('The maximum students per row must be a positive integer.');
+  }
 
-  const seats = [], idx = {};
+  const seats = [], idx = {}, usableSeatCounts = halls.map(() => 0);
   halls.forEach((h, hi) => {
     const blocked = new Set((h.blocked || []).map(String)); // "row-col" 1-based
     for (let c = 0; c < h.cols; c++) for (let r = 0; r < h.rows; r++) {
       if (blocked.has(`${r + 1}-${c + 1}`)) continue;
+      usableSeatCounts[hi]++;
       idx[`${hi}:${r}:${c}`] = seats.length;
       seats.push({ hi, r, c });
     }
   });
   const N = seats.length, ptr = Array(K).fill(0), assign = Array(N).fill(-2);
   let total = C.reduce((s, c) => s + c.students.length, 0);
-  if (total > N) throw new Error(`Not enough seats: ${total} students, ${N} usable seats`);
+  const hallSeatLimits = maxStudents.map((max, hi) => Math.min(max, usableSeatCounts[hi]));
+  const capacity = hallSeatLimits.reduce((sum, count) => sum + count, 0);
+  if (total > capacity) throw new Error(`Not enough seats: ${total} students, ${capacity} usable seats`);
   const hallDepartments = halls.map(() => new Map());
+  const hallOccupancy = halls.map(() => 0);
   const columnDepartments = halls.map(() => new Map());
   const columnOccupancy = halls.map(() => new Map());
-  const clash = (a, b) => a >= 0 && b >= 0 && (strict
-    ? C[a].subject === C[b].subject || C[a].dept === C[b].dept
-    : C[a].dept === C[b].dept && C[a].subject === C[b].subject);
+  const rowOccupancy = halls.map(() => new Map());
+  const clash = (a, b) => a >= 0 && b >= 0 && (options.sameDeptAdjacent !== undefined
+    ? options.sameDeptAdjacent && C[a].dept === C[b].dept
+    : strict
+      ? C[a].subject === C[b].subject || C[a].dept === C[b].dept
+      : C[a].dept === C[b].dept && C[a].subject === C[b].subject);
   const rem = k => C[k].students.length - ptr[k];
   const cand = i => {
     const s = seats[i], l = [];
@@ -75,7 +94,9 @@ function allocate(cohortsIn, halls, strict = true, invigilators = []) {
       const rank = type === 'normal' ? 0 : type === 'lateral' ? 1 : 2;
       if (rank !== departmentPriority.get(C[k].dept) || (columnDept !== undefined && C[k].dept !== columnDept)) continue;
       const usedDepts = hallDepartments[s.hi];
+      if (hallOccupancy[s.hi] >= hallSeatLimits[s.hi]) continue;
       if (!usedDepts.has(C[k].dept) && usedDepts.size >= maxDepartments[s.hi]) continue;
+      if ((rowOccupancy[s.hi].get(s.r) || 0) >= maxPerRow) continue;
       const neighbors = [
         idx[`${s.hi}:${s.r}:${s.c - 1}`],
         idx[`${s.hi}:${s.r - 1}:${s.c - 1}`],
@@ -102,12 +123,15 @@ function allocate(cohortsIn, halls, strict = true, invigilators = []) {
         ptr[k]--;
         const dept = C[k].dept, count = hallDepartments[hall].get(dept) - 1;
         if (count) hallDepartments[hall].set(dept, count); else hallDepartments[hall].delete(dept);
+        hallOccupancy[hall]--;
         const col = seats[i].c, occupancy = columnOccupancy[hall].get(col) - 1;
         if (occupancy) columnOccupancy[hall].set(col, occupancy);
         else {
           columnOccupancy[hall].delete(col);
           columnDepartments[hall].delete(col);
         }
+        const row = seats[i].r, rowCount = rowOccupancy[hall].get(row) - 1;
+        if (rowCount) rowOccupancy[hall].set(row, rowCount); else rowOccupancy[hall].delete(row);
       }
       assign[i] = -2;
       continue;
@@ -116,13 +140,15 @@ function allocate(cohortsIn, halls, strict = true, invigilators = []) {
     if (k >= 0) {
       ptr[k]++;
       hallDepartments[s.hi].set(C[k].dept, (hallDepartments[s.hi].get(C[k].dept) || 0) + 1);
+      hallOccupancy[s.hi]++;
       columnDepartments[s.hi].set(s.c, C[k].dept);
       columnOccupancy[s.hi].set(s.c, (columnOccupancy[s.hi].get(s.c) || 0) + 1);
+      rowOccupancy[s.hi].set(s.r, (rowOccupancy[s.hi].get(s.r) || 0) + 1);
     }
     i++; if (i < N) stack[i] = { c: cand(i), p: 0 };
   }
   // Build output
-  const out = halls.map((h, i) => ({ hallNo: h.hallNo, floor: h.floor, rows: h.rows, cols: h.cols, maxDepartments: maxDepartments[i], invigilator: invigilators[i], seats: [], subjects: [] }));
+  const out = halls.map((h, i) => ({ hallNo: h.hallNo, floor: h.floor, rows: h.rows, cols: h.cols, maxDepartments: maxDepartments[i], maxStudents: maxStudents[i], invigilator: invigilators[i], seats: [], subjects: [] }));
   const hallSeatOffsets = [];
   let nextSeatNo = 0;
   halls.forEach(h => {
