@@ -72,3 +72,17 @@ test('assigns one distinct invigilator to each hall', () => {
   assert.throws(() => allocate([], halls, true, ['Same', 'same']), /only one hall/);
   assert.throws(() => allocate([], [{ ...halls[0], maxDepartments: '' }], true, ['First']), /positive integer/);
 });
+
+test('keeps seat numbers unique across halls', () => {
+  const result = allocate([
+    group('A', 'S1', 'A001', 'A002')
+  ], [
+    { floor: 1, hallNo: 1, rows: 1, cols: 1, maxDepartments: 1 },
+    { floor: 1, hallNo: 2, rows: 1, cols: 1, maxDepartments: 1 },
+    { floor: 1, hallNo: 3, rows: 1, cols: 1, maxDepartments: 1 }
+  ], true, ['Invigilator 1', 'Invigilator 2', 'Invigilator 3']);
+
+  const seatNumbers = result.halls.flatMap(hall => hall.seats.map(seat => seat.seatNo));
+  assert.equal(new Set(seatNumbers).size, seatNumbers.length);
+  assert.deepEqual(seatNumbers, [1, 2]);
+});

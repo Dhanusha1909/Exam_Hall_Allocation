@@ -8,16 +8,55 @@ const Doc = mongoose.model('Doc', new mongoose.Schema({ key: { type: String, uni
 const mem = {}; let useDb = false;
 const put = async (key, data) => useDb ? Doc.findOneAndUpdate({ key }, { data }, { upsert: true }) : (mem[key] = data);
 const get = async key => useDb ? (await Doc.findOne({ key }))?.data : mem[key];
+const makeAllocation = (cfg, unavailableHalls = []) => {
+  const unavailable = new Set(unavailableHalls.map(String));
+  const activeHalls = cfg.halls
+    .map((hall, index) => ({ hall, index }))
+    .filter(({ hall }) => !unavailable.has(String(hall.hallNo)));
+  return allocate(
+    cfg.cohorts,
+    activeHalls.map(({ hall }) => hall),
+    cfg.strict !== false,
+    activeHalls.map(({ index }) => cfg.invigilators?.[index] ?? '')
+  );
+};
 
 // NOTE: align paths/payloads with the locked openapi.yaml if they differ.
-app.post('/api/config', async (req, res) => { await put('config', req.body); res.json({ ok: true }); });
+app.post('/api/config', async (req, res) => {
+  await put('config', req.body);
+  await put('unavailableHalls', []);
+  res.json({ ok: true });
+});
 app.get('/api/config', async (req, res) => res.json((await get('config')) || { cohorts: [], halls: [] }));
 
 app.post('/api/allocate', async (req, res) => {
   try {
     const cfg = (await get('config')) || req.body;
-    const result = allocate(cfg.cohorts, cfg.halls, cfg.strict !== false, cfg.invigilators || []);
+    const result = makeAllocation(cfg, (await get('unavailableHalls')) || []);
     await put('allocation', result); res.json(result);
+  } catch (e) { res.status(422).json({ error: e.message }); }
+});
+app.post('/api/reallocate', async (req, res) => {
+  try {
+    const cfg = await get('config');
+    if (!cfg) return res.status(404).json({ error: 'Configuration not found' });
+    const hallNo = req.body?.hallNo;
+    if (hallNo === undefined || hallNo === null || String(hallNo).trim() === '') {
+      return res.status(400).json({ error: 'Choose a hall to mark unavailable.' });
+    }
+    const hallId = String(hallNo);
+    if (!cfg.halls.some(hall => String(hall.hallNo) === hallId)) {
+      return res.status(404).json({ error: 'Hall not found in the saved configuration.' });
+    }
+    const unavailableHalls = (await get('unavailableHalls')) || [];
+    if (unavailableHalls.some(unavailable => String(unavailable) === hallId)) {
+      return res.status(409).json({ error: `Hall ${hallId} is already unavailable.` });
+    }
+    const nextUnavailableHalls = [...unavailableHalls, hallId];
+    const result = makeAllocation(cfg, nextUnavailableHalls);
+    await put('allocation', result);
+    await put('unavailableHalls', nextUnavailableHalls);
+    res.json(result);
   } catch (e) { res.status(422).json({ error: e.message }); }
 });
 app.get('/api/allocation', async (req, res) => { const a = await get('allocation'); a ? res.json(a) : res.status(404).json({ error: 'Not generated yet' }); });

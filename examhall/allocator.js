@@ -123,12 +123,18 @@ function allocate(cohortsIn, halls, strict = true, invigilators = []) {
   }
   // Build output
   const out = halls.map((h, i) => ({ hallNo: h.hallNo, floor: h.floor, rows: h.rows, cols: h.cols, maxDepartments: maxDepartments[i], invigilator: invigilators[i], seats: [], subjects: [] }));
+  const hallSeatOffsets = [];
+  let nextSeatNo = 0;
+  halls.forEach(h => {
+    hallSeatOffsets.push(nextSeatNo);
+    nextSeatNo += h.rows * h.cols;
+  });
   const cur = Array(K).fill(0);
   seats.forEach((s, n) => {
     const k = assign[n]; if (k < 0) return;
     const c = C[k];
     const student = c.students[cur[k]++];
-    out[s.hi].seats.push({ row: s.r + 1, col: s.c + 1, seatNo: s.c * halls[s.hi].rows + s.r + 1, reg: student.reg, studentType: student.type, dept: c.dept, year: c.year, subject: c.subject });
+    out[s.hi].seats.push({ row: s.r + 1, col: s.c + 1, seatNo: hallSeatOffsets[s.hi] + s.c * halls[s.hi].rows + s.r + 1, reg: student.reg, studentType: student.type, dept: c.dept, year: c.year, subject: c.subject });
   });
   out.forEach(h => { const m = {}; h.seats.forEach(x => m[`${x.subject}|${x.dept}|${x.year}`] = { subject: x.subject, dept: x.dept, year: x.year }); h.subjects = Object.values(m); });
   return { halls: out, conflicts: verify(out, strict), seated: total, generatedAt: new Date() };

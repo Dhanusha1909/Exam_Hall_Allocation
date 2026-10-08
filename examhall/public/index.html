@@ -62,6 +62,7 @@ button.remove:hover{background:#ffeded}
 .seat b{font-size:11px;letter-spacing:.01em}
 .seat.empty{min-height:71px;display:grid;place-items:center;border:1px dashed #d9e0e9;background:#f1f3f6;color:#adb6c4;box-shadow:none;font-size:18px}
 .hall-subjects{display:block;margin-top:13px;color:#68758a;font-size:12px}
+.hall-action{margin-top:8px}
 .finder{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:14px}
 .finder .section-heading{margin:0}
 .finder-controls{display:flex;gap:8px}
@@ -99,6 +100,14 @@ small{color:#526078}
 .hall-subjects{display:block;margin-top:8px;color:#526078;font-size:12px}
 #q{max-width:none}
 @media(max-width:560px){header{height:auto;padding:14px 16px}main{padding:16px 12px 32px}.row,#halls .row{display:block}.row button{width:auto}.hall{padding:8px}.seat{min-width:55px}#q{width:200px;max-width:100%}}
+@media print{
+ body{background:#fff}
+ main{max-width:none;padding:0}
+ main>section:not(#result),#dl,.hall-action,#msg{display:none!important}
+ #result{display:block!important;margin:0;padding:0;box-shadow:none}
+ .hall{break-inside:avoid;overflow:visible}
+ .grid{min-width:0}
+}
 </style></head><body>
 <header>Exam Hall Allocation Tool</header><main>
 <section><h2>1. Student groups (department / year / subject / register range)</h2>
@@ -146,14 +155,26 @@ function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':
 const colors={};const col=k=>colors[k]||(colors[k]=`hsl(${Object.keys(colors).length*67%360} 70% 80%)`);
 function draw(d){$('result').style.display='block';
  const floors=[...new Set(d.halls.map(h=>h.floor))];
- $('dl').innerHTML=floors.map(f=>`<a href="/api/export/floor/${f}"><button>↓ Export floor ${f}</button></a>`).join('')+
+ $('dl').innerHTML='<button class="print-action" onclick="window.print()">Print seating list</button>'+
+  floors.map(f=>`<a href="/api/export/floor/${f}"><button>↓ Export floor ${f}</button></a>`).join('')+
   d.halls.map(h=>`<a href="/api/export/hall/${h.hallNo}"><button class="alt">↓ Export hall ${h.hallNo}</button></a>`).join('');
  $('viz').innerHTML=d.halls.map(h=>{const g={};h.seats.forEach(s=>g[s.row+'-'+s.col]=s);let cells='';
   for(let r=1;r<=h.rows;r++)for(let c=1;c<=h.cols;c++){const s=g[r+'-'+c];
    cells+=s?`<div class="seat" style="background:${col(s.dept)}" title="${s.subject} · ${s.studentType}"><b>${s.reg}</b><br>${s.dept}-Y${s.year}<br>${s.studentType} · Seat ${s.seatNo}</div>`:'<div class="seat empty">—</div>'}
-  return `<div class="hall"><div class="hall-title"><div><strong>Floor ${h.floor} · Hall ${h.hallNo}</strong><div class="hall-meta">${h.seats.length}/${h.rows*h.cols} seats &nbsp;·&nbsp; ${new Set(h.seats.map(s=>s.dept)).size} of ${h.maxDepartments} departments</div></div><span class="invigilator-chip">Invigilator: ${escapeHTML(h.invigilator)}</span></div>
+  return `<div class="hall"><div class="hall-title"><div><strong>Floor ${h.floor} · Hall ${escapeHTML(h.hallNo)}</strong><div class="hall-meta">${h.seats.length}/${h.rows*h.cols} seats &nbsp;·&nbsp; ${new Set(h.seats.map(s=>s.dept)).size} of ${h.maxDepartments} departments</div>
+  <button class="alt hall-action" data-hall="${escapeHTML(h.hallNo)}" onclick="reallocate(this.dataset.hall)">Hall unusable · Re-allocate</button></div><span class="invigilator-chip">Invigilator: ${escapeHTML(h.invigilator)}</span></div>
   <div class="grid" style="grid-template-columns:repeat(${h.cols},1fr)">${cells}</div>
   <small class="hall-subjects">Subjects: ${h.subjects.map(s=>`${s.subject} (${s.dept} Y${s.year})`).join('; ')}</small></div>`}).join('')}
+async function reallocate(hallNo){
+ if(!confirm(`Mark Hall ${hallNo} unusable and re-allocate all students to the remaining halls?`))return;
+ $('msg').textContent='Re-allocating students...';
+ try{
+  const r=await fetch('/api/reallocate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({hallNo})}),d=await r.json();
+  if(!r.ok)throw new Error(d.error||'Re-allocation failed.');
+  $('msg').innerHTML=`<span class="ok">✔ Hall ${escapeHTML(hallNo)} marked unusable. ${d.seated} students re-allocated with ${d.conflicts} conflicts.</span>`;
+  draw(d)
+ }catch(e){$('msg').innerHTML=`<span class="bad">${escapeHTML(e.message)}</span>`}
+}
 async function find(){const r=await fetch('/api/search/'+encodeURIComponent($('q').value)),d=await r.json();
  $('found').innerHTML=r.ok?`<p class="ok">Hall ${d.hallNo} (Floor ${d.floor}) · Row ${d.row}, Column ${d.col} · Seat ${d.seatNo}<br>${d.dept} Year ${d.year} — ${d.subject} (${d.studentType})</p>`:`<p class="bad">${d.error}</p>`}
 sample();
